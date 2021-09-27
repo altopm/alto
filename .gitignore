@@ -8,6 +8,11 @@
 # Test binary, built with `go test -c`
 *.test
 
+# Built binaries
+alto
+alto.exe
+main
+main.exe
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 

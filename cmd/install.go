@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/altopm/alto/errors"
 	"github.com/altopm/alto/ui"
 	. "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -21,7 +22,7 @@ var installCommand = &cobra.Command{
 		wheel.Start()
 		resp, err := http.Get("https://registry-production.up.railway.app/package/" + pkgName)
 		if err != nil {
-			fmt.Print(err)
+			errors.Handle(err.Error())
 		}
 		defer resp.Body.Close()
 		if strings.Contains(resp.Status, "404") {
@@ -50,21 +51,22 @@ var installCommand = &cobra.Command{
 		var url string = fmt.Sprintf("https://registry.altopkg.com/repo/src/%s/binary/%s/", pkgName, pkgName)
 		pkg, err := http.Get(url)
 		if err != nil {
-			fmt.Println(Red("\tError!"), "Could not download package!")
+			errors.Handle("Could not download package!")
 		}
 		defer pkg.Body.Close()
 		if pkg.StatusCode == 404 {
-			fmt.Println(Red("\tError!"), "Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/new")
+			fmt.Println(Red("\tError!"), "Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/new") // Ha, gotcha!
 			fmt.Println(Yellow(fmt.Sprintf("\n\t%s %s %s %s %s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL)))
 		}
 		out, err := os.Create("/var/alto/installs/" + pkgName)
 		if err != nil {
 			wheel2.Stop()
-			fmt.Println(Red("\tError!"), "Permission denied. Please run as sudo!")
+			errors.Handle("Permission denied. Please run as sudo!")
 			os.Exit(1)
 		}
 		_, err = io.Copy(out, pkg.Body)
 		if err != nil {
+			wheel2.Stop()
 			fmt.Print(err)
 		}
 	},
