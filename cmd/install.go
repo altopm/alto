@@ -18,7 +18,7 @@ var installCommand = &cobra.Command{
 	Short: "Install a package",
 	Run: func(cmd *cobra.Command, args []string) {
 		var pkgName string = args[0]
-		wheel := ui.New("%s Searching for package " + pkgName)
+		wheel := ui.Loader("%s Searching for package " + pkgName)
 		wheel.Start()
 		resp, err := http.Get("https://registry-production.up.railway.app/package/" + pkgName)
 		if err != nil {
@@ -31,31 +31,32 @@ var installCommand = &cobra.Command{
 			os.Exit(1)
 		}
 		wheel.Stop()
-		fmt.Println(Green("\tSuccess!"), "Package found!")
-		wheel1 := ui.New("%s Finding package install location")
+		ui.SuccessText("Package found!")
+		wheel1 := ui.Loader("%s Finding package install location")
 		wheel1.Start()
 		s, err := os.Stat("/var/alto/installs")
 		if os.IsNotExist(err) {
 			os.MkdirAll("/var/alto/installs", os.ModePerm)
 			fmt.Print(s)
 			wheel1.Stop()
-			fmt.Println(Green("\tSuccess!"), "Created install location!")
+			ui.SuccessText("Created install location!")
 		} else {
 			wheel1.Stop()
-			fmt.Println(Green("\tSuccess!"), "Found install location!")
+			ui.SuccessText("Found install location!")
 		}
 		wheel1.Stop()
-		wheel2 := ui.New("%s Downloading package")
+		wheel2 := ui.Loader("%s Downloading package")
 		wheel2.Start()
 		// Get the data
-		var url string = fmt.Sprintf("https://registry.altopkg.com/repo/src/%s/binary/%s/", pkgName, pkgName)
+		var url string = fmt.Sprintf("https://registry.altopkg.com/repo/src/%s/binaries/%s/", pkgName, pkgName)
 		pkg, err := http.Get(url)
 		if err != nil {
 			errors.Handle("Could not download package!")
 		}
 		defer pkg.Body.Close()
 		if pkg.StatusCode == 404 {
-			fmt.Println(Red("\tError!"), "Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/new") // Ha, gotcha!
+			wheel2.Stop()
+			errors.Handle("Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/Loader")
 			fmt.Println(Yellow(fmt.Sprintf("\n\t%s %s %s %s %s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL)))
 		}
 		out, err := os.Create("/var/alto/installs/" + pkgName)
@@ -69,6 +70,8 @@ var installCommand = &cobra.Command{
 			wheel2.Stop()
 			fmt.Print(err)
 		}
+		wheel2.Stop()
+		ui.SuccessText("Package downloaded!")
 	},
 }
 

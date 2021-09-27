@@ -22,7 +22,7 @@ type Spinner struct {
 	text   string
 }
 
-func New(text string) *Spinner {
+func Loader(text string) *Spinner {
 	s := &Spinner{
 		text: ("\r\033[K") + text,
 	}
