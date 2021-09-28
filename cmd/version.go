@@ -20,7 +20,7 @@ var versionCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Alto CLI v0.1 -- HEAD")
 		v := &Version{}
-		getJson("https://registry-production.up.railway.app/Status", v)
+		getJson("https://registry.altopkg.com/Status", v)
 		fmt.Printf("Registry: %s\n", v.Version)
 	},
 }
