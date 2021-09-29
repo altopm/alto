@@ -103,7 +103,6 @@ var installCommand = &cobra.Command{
 		wheel5 := ui.Loader("%s Cleaning up")
 		wheel5.Start()
 		os.Remove("logs.log")
-		os.Remove(fmt.Sprintf("/var/alto/installs/%s/tmp", pkgName))
 		wheel5.Stop()
 		ui.SuccessText("All done!")
 		Box := box.New(box.Config{Px: 2, Py: 4, Type: "Double", Color: "Green"})
