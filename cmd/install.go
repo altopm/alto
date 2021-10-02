@@ -17,8 +17,9 @@ import (
 )
 
 var installCommand = &cobra.Command{
-	Use:   "install",
-	Short: "Install a package",
+	Use:     "install",
+	Short:   "Install a package",
+	Aliases: []string{"i"},
 	Run: func(cmd *cobra.Command, args []string) {
 		var pkgName string = args[0]
 		initWheel := ui.Loader("%s Initializing...")
