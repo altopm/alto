@@ -4,7 +4,7 @@
  * make it work with the rest of the project.
  */
 
-package ui
+package utils
 
 import (
 	"fmt"
