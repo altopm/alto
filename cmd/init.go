@@ -41,6 +41,14 @@ func initPackage(packageTitle string) {
 		initWheel.Stop()
 		errors.Handle(err.Error())
 	}
+	initfile, err := os.Create("./.alton/alto.json")
+	if err != nil {
+		initWheel.Stop()
+		errors.Handle(err.Error())
+	}
+	defer initfile.Close()
+	// this might actually be worse then regexp
+	fmt.Fprintln(initfile, fmt.Sprintf("{\n\t\"title\": \"%s\"\n}", packageTitle))
 	initWheel.Stop()
 	utils.MessageSuccess(fmt.Sprintf("%s initialized successfully", packageTitle))
 	utils.MessageNeutral("We strongly suggest adding .alton directory to your .gitignore")
