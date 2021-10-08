@@ -42,7 +42,8 @@ func initPackage(packageTitle string) {
 		errors.Handle(err.Error())
 	}
 	initWheel.Stop()
-	utils.MessageSuccess()
+	utils.MessageSuccess(fmt.Sprintf("%s initialized successfully", packageTitle))
+	utils.MessageNeutral("We strongly suggest adding .alton directory to your .gitignore")
 }
 func init() {
 	rootCmd.AddCommand(initCommand)
