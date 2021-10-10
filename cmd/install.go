@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/Delta456/box-cli-maker"
+	"github.com/Delta456/box-cli-maker/v2"
 	"github.com/altopm/alto/errors"
 	"github.com/altopm/alto/logs"
 	"github.com/altopm/alto/utils"
