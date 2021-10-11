@@ -49,27 +49,34 @@ func installNormal(args []string) {
 	utils.MessageSuccess("Created logfile & temporary directory")
 	wheel := utils.Loader("%s Searching for package " + pkgName)
 	wheel.Start()
+	logs.AppendLog(fmt.Sprintf("Pinging registry... (url: %s) GET", pkgName))
 	resp, err := http.Get("https://registry.altopkg.com/package/" + pkgName)
 	if err != nil {
+		logs.AppendLog(fmt.Sprintf("Error: %s || StatusCode: %d", err, resp.StatusCode))
 		errors.Handle(err.Error())
 	}
 	defer resp.Body.Close()
 	if strings.Contains(resp.Status, "404") {
+		logs.AppendLog(fmt.Sprintf("Error: Package not found"))
 		wheel.Stop()
 		errors.Handle("Package not found. Double check your spelling and/or that you have the correct registry installed!")
 	}
+	logs.AppendLog(fmt.Sprintf("StatusCode: %d", resp.StatusCode))
 	wheel.Stop()
 	utils.MessageSuccess("Package found!")
 	wheel1 := utils.Loader("%s Finding package install location")
 	wheel1.Start()
+	logs.AppendLog(fmt.Sprintf("Finding package install location. Planned location: /var/alto/installs/%s", pkgName))
 	s, err := os.Stat("/var/alto/installs")
 	if os.IsNotExist(err) {
 		os.MkdirAll("/var/alto/installs", os.ModePerm)
 		fmt.Print(s)
 		wheel1.Stop()
+		logs.AppendLog("Created install directory")
 		utils.MessageSuccess("Created install location!")
 	} else {
 		wheel1.Stop()
+		logs.AppendLog("Install directory already exists")
 		utils.MessageSuccess("Found install location!")
 	}
 	wheel1.Stop()
@@ -77,18 +84,23 @@ func installNormal(args []string) {
 	wheel2.Start()
 	// Get the data
 	var url string = fmt.Sprintf("https://registry.altopkg.com/repo/src/%s/binaries/%s.zip", pkgName, pkgName)
+	logs.AppendLog(fmt.Sprintf("Downloading package from %s", url))
 	pkg, err := http.Get(url)
 	if err != nil {
+		logs.AppendLog(fmt.Sprintf("Error: %s || StatusCode: %d", err, resp.StatusCode))
 		errors.Handle("Could not download package!")
 	}
 	defer pkg.Body.Close()
 	if pkg.StatusCode == 404 {
+		logs.AppendLog(fmt.Sprintf("There was an unknown error. Details follow:\n%s %s %s %s %s\n\n%s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL, err.Error()))
 		wheel2.Stop()
 		errors.Handle("Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/Loader")
 		utils.MessageWarning(fmt.Sprintf("\n\t%s %s %s %s %s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL))
 	}
+	logs.AppendLog(fmt.Sprintf("StatusCode: %d", pkg.StatusCode))
 	out, err := os.Create("/var/alto/installs/" + pkgName)
 	if err != nil {
+		logs.AppendLog("User forgot to run as sudo")
 		wheel2.Stop()
 		errors.Handle("Permission denied. Please run as sudo!")
 	}
@@ -101,20 +113,24 @@ func installNormal(args []string) {
 	utils.MessageSuccess("Package downloaded!")
 	wheel3 := utils.Loader("%s Unpacking")
 	wheel3.Start()
+	logs.AppendLog(fmt.Sprintf("Unpacking package"))
 	unpkg := exec.Command("tar", "-xvf", "/var/alto/installs/"+pkgName)
 	err = unpkg.Run()
 	if err != nil {
+		logs.AppendLog("An unknown error occurred: " + err.Error())
 		wheel3.Stop()
 		errors.Handle("Could not unpack package!")
 	}
 	wheel3.Stop()
 	utils.MessageSuccess("Package unpacked!")
+	logs.AppendLog("Adding package to PATH envvar")
 	wheel4 := utils.Loader("%s Adding to PATH")
 	wheel4.Start()
 	var path string = os.Getenv("PATH")
 	var appPath string = fmt.Sprintf("/var/alto/installs/bin/%s/", pkgName)
 	err = os.Setenv("PATH", fmt.Sprintf("%s:%s", appPath, path))
 	if err != nil {
+		logs.AppendLog("An unknown error occurred: " + err.Error())
 		wheel4.Stop()
 		errors.Handle("Could not add to PATH!")
 		fmt.Println(err)
@@ -123,13 +139,16 @@ func installNormal(args []string) {
 	utils.MessageSuccess("Package added to PATH!")
 	wheel5 := utils.Loader("%s Cleaning up")
 	wheel5.Start()
+	logs.AppendLog("Removing this logfile")
 	err = os.Remove("./logs.log")
 	if err != nil {
+		logs.AppendLog("An unknown error occurred: " + err.Error())
 		wheel5.Stop()
 		errors.Handle(err.Error())
 	}
 	err = os.RemoveAll("./bin")
 	if err != nil {
+		logs.AppendLog("An unknown error occurred: " + err.Error())
 		wheel5.Stop()
 		errors.Handle(err.Error())
 	}
