@@ -102,10 +102,19 @@ var installCommand = &cobra.Command{
 		utils.MessageSuccess("Package added to PATH!")
 		wheel5 := utils.Loader("%s Cleaning up")
 		wheel5.Start()
-		os.Remove("logs.log")
+		err = os.Remove("./logs.log")
+		if err != nil {
+			wheel5.Stop()
+			errors.Handle(err.Error())
+		}
+		err = os.RemoveAll("./bin")
+		if err != nil {
+			wheel5.Stop()
+			errors.Handle(err.Error())
+		}
 		wheel5.Stop()
 		utils.MessageSuccess("All done!")
-		Box := box.New(box.Config{Px: 2, Py: 4, Type: "Double", Color: "Green"})
+		Box := box.New(box.Config{Px: 12, Py: 2, Type: "Double", Color: "Green"})
 		Box.Print("Installed successfully!", "Thanks for using alto!")
 	},
 }
