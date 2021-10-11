@@ -12,6 +12,8 @@ import (
 	"github.com/altopm/alto/errors"
 	"github.com/altopm/alto/logs"
 	"github.com/altopm/alto/utils"
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
@@ -32,10 +34,12 @@ var installCommand = &cobra.Command{
 		}
 		if len(args) == 0 {
 			errors.Handle("Please specify a package to install!")
+		} else if (Verbose == false) && (Hackery == false) && (len(args) == 1) {
+			installNormal(args)
 		}
-		installNormal(args)
 	},
 }
+
 func installNormal(args []string) {
 	var pkgName string = args[0]
 	initWheel := utils.Loader("%s Initializing...")
@@ -135,7 +139,79 @@ func installNormal(args []string) {
 	Box.Print("Installed successfully!", "Thanks for using alto!")
 }
 func installHackerModeEnabled(args []string) {
-
+	var pkgName string = args[0]
+	for i := 0; i < 100; i++ {
+		fmt.Println(aurora.Green(gofakeit.HackerPhrase()))
+	}
+	for i := 0; i < 100; i++ {
+		fmt.Println(aurora.Green(gofakeit.NewCrypto()))
+	}
+	logs.CreateLogFile()
+	utils.MessageSuccess("Created logfile & temporary directory")
+	resp, err := http.Get("https://registry.altopkg.com/package/" + pkgName)
+	for i := 0; i < 100000; i++ {
+		fmt.Print(gofakeit.BitcoinAddress())
+	}
+	if err != nil {
+		errors.Handle(err.Error())
+	}
+	defer resp.Body.Close()
+	if strings.Contains(resp.Status, "404") {
+		errors.Handle("Package not found. Double check your spelling and/or that you have the correct registry installed!")
+	}
+	fmt.Print("\n")
+	utils.MessageSuccess("Generated heck adress!")
+	s, err := os.Stat("/var/alto/installs")
+	if os.IsNotExist(err) {
+		os.MkdirAll("/var/alto/installs", os.ModePerm)
+		fmt.Print(s)
+		utils.MessageSuccess("Created install location!")
+	} else {
+		utils.MessageSuccess("Posted heck address to hecking API!")
+	}
+	// Get the data
+	var url string = fmt.Sprintf("https://registry.altopkg.com/repo/src/%s/binaries/%s.zip", pkgName, pkgName)
+	pkg, err := http.Get(url)
+	if err != nil {
+		errors.Handle("Could not download package!")
+	}
+	defer pkg.Body.Close()
+	if pkg.StatusCode == 404 {
+		errors.Handle("Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/Loader")
+		utils.MessageWarning(fmt.Sprintf("\n\t%s %s %s %s %s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL))
+	}
+	out, err := os.Create("/var/alto/installs/" + pkgName)
+	if err != nil {
+		errors.Handle("Permission denied. Please run as sudo!")
+	}
+	_, err = io.Copy(out, pkg.Body)
+	if err != nil {
+		fmt.Print(err)
+	}
+	utils.MessageSuccess("Hecking software installed!")
+	unpkg := exec.Command("tar", "-xvf", "/var/alto/installs/"+pkgName)
+	err = unpkg.Run()
+	if err != nil {
+		errors.Handle("Could not unpack package!")
+	}
+	utils.MessageSuccess("Hecker unpacked!")
+	var path string = os.Getenv("PATH")
+	var appPath string = fmt.Sprintf("/var/alto/installs/bin/%s/", pkgName)
+	err = os.Setenv("PATH", fmt.Sprintf("%s:%s", appPath, path))
+	if err != nil {
+		errors.Handle("Could not add to PATH!")
+		fmt.Println(err)
+	}
+	utils.MessageSuccess("Hecker is ready to use!")
+	err = os.Remove("./logs.log")
+	if err != nil {
+		errors.Handle(err.Error())
+	}
+	err = os.RemoveAll("./bin")
+	if err != nil {
+		errors.Handle(err.Error())
+	}
+	utils.MessageSuccess("HECKING READY!")
 }
 func installVerbose(args []string) {
 

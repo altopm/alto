@@ -15,3 +15,6 @@ func MessageWarning(message string) {
 func MessageSuccess(scMsg string) {
 	fmt.Println(aurora.Green("\tSuccess! "), scMsg)
 }
+func HackerText(message string) {
+	fmt.Println(aurora.Green(message))
+}
