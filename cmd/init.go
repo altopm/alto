@@ -23,7 +23,6 @@ var qs = []*survey.Question{
 	{
 		Name:      "deps",
 		Prompt:    &survey.Input{Message: "Any needed dependencies? (e.g. nodejs, python3, or express.js)"},
-		Validate:  survey.Required,
 		Transform: survey.Title,
 	},
 	{
