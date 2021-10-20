@@ -19,21 +19,35 @@ var initCommand = &cobra.Command{
 		initPackage(args[0])
 	},
 }
-var depsS = []*survey.Question{
+var qs = []*survey.Question{
 	{
 		Name:      "deps",
 		Prompt:    &survey.Input{Message: "Any needed dependencies? (e.g. nodejs, python3, or express.js)"},
 		Validate:  survey.Required,
 		Transform: survey.Title,
 	},
+	{
+		Name: "furtherConfig",
+		Prompt: &survey.Select{
+			Message: "Any further configuration? (e.g. a shellfile to set the user's OS in a config file)",
+			Options: []string{"no", "yes"},
+			Default: "yes",
+		},
+	},
 }
 
 func initPackage(packageTitle string) {
-	depsSAns := struct {
-		Deps string `survey:"deps"`
+	qsAns := struct {
+		Deps          string `survey:"deps"`
+		FurtherConfig string `survey:"furtherConfig"`
 	}{}
-	err := survey.Ask(depsS, &depsSAns)
-	deps := utils.SplitString(depsSAns.Deps, " ")
+	err := survey.Ask(qs, &qsAns)
+	if err != nil {
+		errors.Handle(err.Error())
+		os.Exit(1)
+	}
+	fmt.Println(qsAns)
+	deps := utils.SplitString(qsAns.Deps, " ")
 	initWheel := utils.Loader("%s Initializing...")
 	initWheel.Start()
 	if err != nil {
