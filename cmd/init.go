@@ -45,7 +45,6 @@ func initPackage(packageTitle string) {
 		errors.Handle(err.Error())
 		os.Exit(1)
 	}
-	fmt.Println(qsAns)
 	deps := utils.SplitString(qsAns.Deps, " ")
 	initWheel := utils.Loader("%s Initializing...")
 	initWheel.Start()
