@@ -83,7 +83,7 @@ func installNormal(args []string) {
 	wheel2 := utils.Loader("%s Downloading package")
 	wheel2.Start()
 	// Get the data
-	var url string = fmt.Sprintf("https://registry.altopkg.com/repo/src/%s/binaries/%s.zip", pkgName, pkgName)
+	var url string = fmt.Sprintf("https://flags.altopkg.com/%s/%s.tar.gz", pkgName, pkgName)
 	logs.AppendLog(fmt.Sprintf("Downloading package from %s", url))
 	pkg, err := http.Get(url)
 	if err != nil {
