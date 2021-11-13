@@ -6,6 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
 	github.com/Delta456/box-cli-maker/v2 v2.2.2
 	github.com/brianvoe/gofakeit/v6 v6.9.0
+	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spf13/cobra v1.2.1
 )

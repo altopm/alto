@@ -83,32 +83,18 @@ func installNormal(args []string) {
 	wheel2 := utils.Loader("%s Downloading package")
 	wheel2.Start()
 	// Get the data
-	var url string = fmt.Sprintf("https://flags.altopkg.com/%s/%s.tar.gz", pkgName, pkgName)
-	logs.AppendLog(fmt.Sprintf("Downloading package from %s", url))
-	pkg, err := http.Get(url)
-	if err != nil {
-		logs.AppendLog(fmt.Sprintf("Error: %s || StatusCode: %d", err, resp.StatusCode))
-		errors.Handle("Could not download package!")
-	}
-	defer pkg.Body.Close()
-	if pkg.StatusCode == 404 {
-		logs.AppendLog(fmt.Sprintf("There was an unknown error. Details follow:\n%s %s %s %s %s\n\n%s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL, err.Error()))
-		wheel2.Stop()
-		errors.Handle("Please report this bug, as well as the following information on GitHub: https://github.com/altopm/alto/issues/Loader")
-		utils.MessageWarning(fmt.Sprintf("\n\t%s %s %s %s %s", pkg.Proto, pkg.Status, pkg.Header, pkg.Request.Method, pkg.Request.URL))
-	}
-	logs.AppendLog(fmt.Sprintf("StatusCode: %d", pkg.StatusCode))
-	out, err := os.Create("/var/alto/installs/" + pkgName)
+	location := fmt.Sprintf("/var/alto/installs")
+	_, err = os.Create(location)
 	if err != nil {
 		logs.AppendLog("User forgot to run as sudo")
 		wheel2.Stop()
 		errors.Handle("Permission denied. Please run as sudo!")
 	}
 	// TODO - DO NOT COPY, JUST WRITE
-	_, err = io.Copy(out, pkg.Body)
+	_, err = utils.GetPackage(pkgName)
 	if err != nil {
-		wheel2.Stop()
-		fmt.Print(err)
+		logs.AppendLog(fmt.Sprintf("Error: %s || StatusCode: %d", err, resp.StatusCode))
+		errors.Handle(err.Error())
 	}
 	wheel2.Stop()
 	utils.MessageSuccess("Package downloaded!")
