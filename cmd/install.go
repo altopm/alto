@@ -104,6 +104,7 @@ func installNormal(args []string) {
 		wheel2.Stop()
 		errors.Handle("Permission denied. Please run as sudo!")
 	}
+	// TODO - DO NOT COPY, JUST WRITE
 	_, err = io.Copy(out, pkg.Body)
 	if err != nil {
 		wheel2.Stop()
@@ -127,8 +128,10 @@ func installNormal(args []string) {
 	wheel4 := utils.Loader("%s Adding to PATH")
 	wheel4.Start()
 	var path string = os.Getenv("PATH")
+	var formattedPath string = strings.ReplaceAll(path, "%", "")
 	var appPath string = fmt.Sprintf("/var/alto/installs/bin/%s/", pkgName)
-	err = os.Setenv("PATH", fmt.Sprintf("%s:%s", appPath, path))
+	var formattedAppPath string = strings.ReplaceAll(appPath, "%", "")
+	err = os.Setenv("PATH", fmt.Sprintf("%s:%s", formattedPath, formattedAppPath))
 	if err != nil {
 		logs.AppendLog("An unknown error occurred: " + err.Error())
 		wheel4.Stop()
