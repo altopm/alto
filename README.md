@@ -14,7 +14,7 @@ What you need to do next depends on your distro.
 ### Building the binary yourself
 You can build the binary yourself. You **must** have [go](https://golang.org) installed. Then clone and change into the `alto` directory:
 ```sh
-git clone https://github.com/altopm/alto.git ** cd alto
+git clone https://github.com/altopm/alto.git && cd alto
 ```
 Then run the following command:
 ```sh
