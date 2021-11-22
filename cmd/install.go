@@ -84,11 +84,13 @@ func installNormal(args []string) {
 	wheel2.Start()
 	// Get the data
 	location := fmt.Sprintf("/var/alto/installs")
-	_, err = os.Create(location)
-	if err != nil {
-		logs.AppendLog("User forgot to run as sudo")
-		wheel2.Stop()
-		errors.Handle("Permission denied. Please run as sudo!")
+	if !utils.DoesDirectoryExist(location) {
+		_, err = os.Create(location)
+		if err != nil {
+			logs.AppendLog("User forgot to run as sudo")
+			wheel2.Stop()
+			panic(err)
+		}
 	}
 	// TODO - DO NOT COPY, JUST WRITE
 	_, err = utils.GetPackage(pkgName)
@@ -128,6 +130,12 @@ func installNormal(args []string) {
 	utils.MessageSuccess("Package added to PATH!")
 	wheel5 := utils.Loader("%s Cleaning up")
 	wheel5.Start()
+	err = os.Remove(pkgName)
+	if err != nil {
+		logs.AppendLog("An unknown error occurred: " + err.Error())
+		wheel5.Stop()
+		errors.Handle("Could not remove package!")
+	}
 	logs.AppendLog("Removing this logfile")
 	err = os.Remove("./logs.log")
 	if err != nil {
