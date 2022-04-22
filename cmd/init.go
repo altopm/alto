@@ -19,11 +19,7 @@ var initCommand = &cobra.Command{
 		initPackage(args[0])
 	},
 }
-<<<<<<< Updated upstream
-var qs = []*survey.Question{
-=======
 var resps = []*survey.Question{
->>>>>>> Stashed changes
 	{
 		Name: "furtherConfig",
 		Prompt: &survey.Select{
@@ -35,11 +31,11 @@ var resps = []*survey.Question{
 }
 
 func initPackage(packageTitle string) {
-	respsAns := struct {
-		Deps string `survey:"deps"`
+	qsAns := struct {
+		Deps          string `survey:"deps"`
+		FurtherConfig string `survey:"furtherconfig"`
 	}{}
-	err := survey.Ask(resps, &respsAns)
-	deps := utils.SplitString(respsAns.Deps, " ")
+	err := survey.Ask(resps, &qsAns)
 	if err != nil {
 		errors.Handle(err.Error())
 		os.Exit(1)
