@@ -19,11 +19,7 @@ var initCommand = &cobra.Command{
 		initPackage(args[0])
 	},
 }
-<<<<<<< Updated upstream
-var qs = []*survey.Question{
-=======
 var resps = []*survey.Question{
->>>>>>> Stashed changes
 	{
 		Name: "furtherConfig",
 		Prompt: &survey.Select{
@@ -32,14 +28,21 @@ var resps = []*survey.Question{
 			Default: "yes",
 		},
 	},
+	{
+		Name: "description",
+		Prompt: &survey.Input{
+			Message: "Enter a descripton (enter to skip)",
+		},
+	},
 }
 
 func initPackage(packageTitle string) {
-	respsAns := struct {
-		Deps string `survey:"deps"`
+	qsAns := struct {
+		Deps          string `survey:"deps"`
+		FurtherConfig string `survey:"furtherconfig"`
+		Description   string `survey:"description"`
 	}{}
-	err := survey.Ask(resps, &respsAns)
-	deps := utils.SplitString(respsAns.Deps, " ")
+	err := survey.Ask(resps, &qsAns)
 	if err != nil {
 		errors.Handle(err.Error())
 		os.Exit(1)
@@ -90,7 +93,7 @@ func initPackage(packageTitle string) {
 		utils.MessageSuccess("Initfile created!")
 	}
 	// this might actually be worse then regexp
-	_, err = fmt.Fprintln(initfile, fmt.Sprintf("{\n\t\"title\": \"%s\"\n}", packageTitle))
+	_, err = fmt.Fprintln(initfile, fmt.Sprintf(`{\n\t"title": "%s",\n\t"description": "%s"}`, packageTitle, qsAns.Description))
 	if err != nil {
 		initWheel.Stop()
 		errors.Handle(err.Error())
