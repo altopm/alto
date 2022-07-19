@@ -49,7 +49,8 @@ func installNormal(args []string) {
 	utils.MessageSuccess("Created logfile & temporary directory")
 	wheel := utils.Loader("%s Searching for package " + pkgName)
 	wheel.Start()
-	logs.AppendLog(fmt.Sprintf("Pinging registry... (url: %s) GET", pkgName))
+	url := fmt.Sprintf("https://registry.altopkg.com/package/%s", pkgName)
+	logs.AppendLog(fmt.Sprintf("Pinging registry... (url: %s) GET", url))
 	resp, err := http.Get("https://registry.altopkg.com/package/" + pkgName)
 	if err != nil {
 		logs.AppendLog(fmt.Sprintf("Error: %s || StatusCode: %d", err, resp.StatusCode))
