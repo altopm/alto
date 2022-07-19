@@ -10,7 +10,7 @@ import (
 
 func CreateLogFile() {
 	time := time.Now()
-	logFile, err := os.Create("logs.log")
+	logFile, err := os.Create("alto-install.log")
 	if err != nil {
 		errors.Handle(err.Error())
 	}
@@ -21,11 +21,14 @@ func CreateLogFile() {
 }
 func AppendLog(event string) {
 	time := time.Now()
-	file, err := os.Create("logs.log")
+
+	log, err := os.OpenFile("alto-install.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		errors.Handle(err.Error())
 	}
-	_, err = fmt.Fprintln(file, fmt.Sprintf("%s: %s", time.Format("2006-01-02 15:04:05.000000"), event))
+	defer log.Close()
+
+	_, err = log.WriteString(fmt.Sprintf("%s: %s\n", time.Format("2006-01-02 15:04:05.000000"), event))
 	if err != nil {
 		errors.Handle(err.Error())
 	}
